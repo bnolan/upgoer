@@ -28,7 +28,7 @@
 
 </div>
 
-<input type="text" />
+<input id="input" type="text"/>
 <div id="spelling"></div>
 
 <script>
@@ -52,17 +52,33 @@ function preprocess(word){
 
   var input = $("input");
 
+  function computed_word_dimensions(word) {
+    var font = $('#input').css('font');
+    var sizer = $("<div />").text(word).css({'font': font, 'display' : 'inline-block'});
+    var spacer = $("<div />").html(word + '&nbsp;').css({'font': font, 'display' : 'inline-block'});
+
+    sizer.appendTo('body');
+    spacer.appendTo('body')
+    var word_width = sizer.width();
+    var block_width = spacer.width();
+    spacer.remove();
+    sizer.remove();
+    return({'word': word_width, 'offset': block_width});
+  }
+
   function checkSpelling(){
     var words = input.val().split(' ');
     var x = 0;
-    var size = 14.5;
-
+    
     $("#spelling").empty();
 
     words.forEach( function (word) {
-      word = preprocess(word);
+      var word_dimensions = computed_word_dimensions(word);
+      var word = preprocess(word);
 
-      var el = $("<b>&nbsp;</b>").css({width : word.length * size, left : x}).appendTo('#spelling');
+      console.log(word_dimensions);
+
+      var el = $("<b>&nbsp;</b>").css({width : word_dimensions['word'], left : x}).appendTo('#spelling');
       
       if (dictionary[word]){
         el.addClass('green');
@@ -70,7 +86,7 @@ function preprocess(word){
         el.addClass('red');
       }
 
-      x += word.length * size + size;
+      x += word_dimensions['offset'];
     });
   }
 
