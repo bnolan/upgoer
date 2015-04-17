@@ -29,7 +29,7 @@
 <script src="/upgoer-widget.js"></script>
 
 <script>
-  var chatCallback = function(text) { $("#chatlog").append('you: ' + text); }
+  var chatCallback = function(text) { $("<div />").text('you: ' + text).appendTo('#chatlog'); }
   $(function() { $("#upgoer").upgoer({'chatCallback': chatCallback}).appendTo('body') })
 </script>
 
