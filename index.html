@@ -29,8 +29,14 @@
 <script src="/upgoer-widget.js"></script>
 
 <script>
-  var chatCallback = function(text) { $("<div />").text('you: ' + text).appendTo('#chatlog'); }
-  $(function() { $("#upgoer").upgoer({'chatCallback': chatCallback}).appendTo('body') })
+  var ws = new WebSocket("ws://localhost:8080/", 'echo-protocol');
+  var chatCallback = function(text) { $("<div />").text('you: ' + text).appendTo('#chatlog'); ws.send(text); }
+
+  ws.onmessage = function(e) {
+    $("<div />").text(e.data).appendTo('#chatlog')
+  }
+
+  $(function() { $("#upgoer").upgoer({chatCallback: chatCallback, stemmer: stemmer}).appendTo('body') })
 </script>
 
 </head>
