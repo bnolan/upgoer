@@ -34,10 +34,10 @@ $.widget('upgoer.upgoer', {
       var input     = options.input;
       var spelling  = options.spelling;
 
-      checkSpelling(self, input, spelling, dictionary);
+      var spellingResults = checkSpelling(self, input, spelling, dictionary);
 
       if(e.keyCode === 13){
-        sendChat(self, input.val());
+        sendChat(self, input.val(), spellingResults);
 
         input.val('');
         spelling.empty();
@@ -73,8 +73,8 @@ function preprocess(widget, word){
   return widget.options.stemmer(word.toLowerCase().replace(/[^a-z]/g, ''));
 }
 
-function sendChat(widget, text) {
-  widget.options.chatCallback(text);
+function sendChat(widget, text, blocks) {
+  widget.options.chatCallback(text, blocks);
 }
 
 function computed_word_dimensions(word, font) {
@@ -92,6 +92,7 @@ function computed_word_dimensions(word, font) {
 
 function checkSpelling(widget, input, spelling){
   var words = input.val().split(' ');
+  var results = [];
   input_border = input.css('border');
   var x = parseInt(input_border.replace(/(\d+)px.*/,'$1'));
   
@@ -100,7 +101,7 @@ function checkSpelling(widget, input, spelling){
   words.forEach( function (word) {
     var font = input.css('font');
     var word_dimensions = computed_word_dimensions(word, font);
-    var word = preprocess(widget, word);
+    var processed_word = preprocess(widget, word);
 
     var el = $("<b>&nbsp;</b>").css({width : word_dimensions['word'], left : x}).appendTo(spelling);
     
@@ -110,8 +111,10 @@ function checkSpelling(widget, input, spelling){
       el.addClass('red');
     }
 
+    results = results.concat({word: word, presence: widget.dictionary[word]});
     x += word_dimensions['offset'];
   });
+  return(results);
 }
 
 function createInput(value, widget) {
