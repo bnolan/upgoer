@@ -21,6 +21,12 @@
   .spelling .red{
     border-color: red;
   }
+  font.present{
+    color: green;
+  }
+  font.absent{
+    color: red;
+  }
 </style>
 
 <script src="/jquery.js"></script>
@@ -30,7 +36,19 @@
 
 <script>
   var ws = new WebSocket("ws://localhost:8080/", 'echo-protocol');
-  var chatCallback = function(text) { $("<div />").text('you: ' + text).appendTo('#chatlog'); ws.send(text); }
+  var chatCallback = function(text, blocks) {
+    var el = $("<div />").text('you: ').appendTo('#chatlog');
+    console.log(blocks);
+    blocks.forEach( function(block) {
+      if (block.presence) {
+        $('<font class="present"/>').text(block.word + ' ').appendTo(el);
+      } else {
+        $('<font class="absent"/>').text(block.word + ' ').appendTo(el);
+      }
+    });
+
+    ws.send(text);
+  }
 
   ws.onmessage = function(e) {
     $("<div />").text(e.data).appendTo('#chatlog')
